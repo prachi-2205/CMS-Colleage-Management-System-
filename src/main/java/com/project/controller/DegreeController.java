@@ -90,5 +90,6 @@ public class DegreeController {
 		return new ModelAndView("admin/addDegree", "DegreeVO", degreeVO).addObject("type", "Edit ").addObject("button",
 				"Update ");
 	}
+	
 
 }

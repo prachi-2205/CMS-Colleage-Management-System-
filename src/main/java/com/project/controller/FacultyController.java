@@ -18,8 +18,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.project.model.AcademicVO;
+import com.project.model.DegreeVO;
+import com.project.model.ExamVO;
 import com.project.model.FacultyVO;
 import com.project.model.LoginVO;
+import com.project.model.SemesterVO;
 import com.project.service.FacultyService;
 import com.project.service.LoginService;
 import com.project.utils.BaseMethods;
@@ -151,6 +155,11 @@ public class FacultyController {
 		return new ModelAndView("admin/viewFaculty", "facultyList", facultyList);
 	}
 	
+	@GetMapping(value = "user/teacher")
+	public ModelAndView viewTeacher() {
+		List<FacultyVO> facultyList = this.facultyService.getFaculty();
+		return new ModelAndView("user/teacher", "facultyList", facultyList);
+	}
 	
 	
 
@@ -175,6 +184,16 @@ public class FacultyController {
 		return new ModelAndView("redirect:/admin/viewFaculty");
 	}
 
+	@GetMapping(value = "user/teacher-profile")
+	public ModelAndView teacherprofile(@ModelAttribute FacultyVO facultyVO, @RequestParam int id) {
+
+		List<FacultyVO> facultyList = this.facultyService.findById(facultyVO);
+
+		facultyVO = facultyList.get(0);
+
+		return new ModelAndView("user/teacherProfile", "facultyVO", facultyVO);
+	}
+	
 	@GetMapping(value = "admin/editFaculty")
 	public ModelAndView editFaculty(@ModelAttribute FacultyVO facultyVO, @RequestParam int id) {
 

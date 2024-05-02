@@ -1,9 +1,5 @@
 package com.project.controller;
 
-
-
-
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,11 +15,13 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.project.model.AcademicVO;
 import com.project.model.DegreeVO;
 import com.project.model.ExamVO;
 import com.project.model.SemesterVO;
@@ -31,12 +29,8 @@ import com.project.service.DegreeService;
 import com.project.service.ExamService;
 import com.project.service.SemesterService;
 
-
-
-
 @Controller
 public class ExamController {
-
 	
 	@Autowired
 	private DegreeService degreeService;
@@ -89,7 +83,73 @@ public class ExamController {
 	}
 	
 	
+	@PostMapping(value = "user/saveUserExam")
+	public ModelAndView saveUserExam(@ModelAttribute ExamVO examVO, @RequestParam MultipartFile file,
+			HttpServletRequest request) {
+
+		if (examVO.getId() != null && examVO.getId() > 0) {
+			List<ExamVO> examList = this.examService.findById(examVO);
+			ExamVO examVO2 = examList.get(0);
+			
+			
+			if(file.isEmpty()){
+				
+				examVO.setFileName(examVO2.getFileName());
+				examVO.setFilePath(examVO2.getFilePath());
+			}else{
+			
 	
+			String path = request.getSession().getServletContext().getRealPath("/");
+			String filePath = path + "documents\\exam\\";
+
+			File f = new File(filePath + examVO2.getFileName());
+			f.delete();
+			// Save File
+			
+			String fileName = file.getOriginalFilename();
+			try {
+				byte barr[] = file.getBytes();
+
+				BufferedOutputStream bout = new BufferedOutputStream(new FileOutputStream(filePath + "/" + fileName));
+
+				bout.write(barr);
+				bout.flush();
+				bout.close();
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			examVO.setFileName(fileName);
+			examVO.setFilePath(filePath);
+			}
+		}else{
+
+		String path = request.getSession().getServletContext().getRealPath("/");
+
+		String fileName = file.getOriginalFilename();
+
+		String filePath = path + "documents\\exam\\";
+
+		try {
+			byte barr[] = file.getBytes();
+
+			BufferedOutputStream bout = new BufferedOutputStream(new FileOutputStream(filePath + "/" + fileName));
+
+			bout.write(barr);
+			bout.flush();
+			bout.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		examVO.setFileName(fileName);
+		examVO.setFilePath(filePath);
+		}
+		this.examService.saveExam(examVO);
+		return new ModelAndView("redirect:/user/exam");
+	}
 	
 	
 	
@@ -219,4 +279,5 @@ public class ExamController {
 		return new ModelAndView("admin/addExam", "ExamVO", examVO).addObject("degreelist", degreelist)
 				.addObject("semesterlist", semesterlist).addObject("type","Edit ").addObject("button","Update ");
 	}
+
 }

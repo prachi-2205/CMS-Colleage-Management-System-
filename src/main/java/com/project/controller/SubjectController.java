@@ -1,6 +1,5 @@
 package com.project.controller;
 
-
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,11 +24,8 @@ import com.project.service.DegreeService;
 import com.project.service.SemesterService;
 import com.project.service.SubjectService;
 
-
-
 @Controller
 public class SubjectController {
-
 
 	@Autowired
 	private DegreeService degreeService;
@@ -40,7 +36,10 @@ public class SubjectController {
 	@Autowired
 	private SubjectService subjectService;
 
-	
+	@RequestMapping(value = "/user/sub", method = RequestMethod.GET)
+	public ModelAndView sub() {
+		return new ModelAndView("user/blog-list");
+	}
 
 	@GetMapping(value = "admin/getSemesterOfSubject")
 	public ResponseEntity getSemesterOfSubject(String subjectId) {
@@ -118,5 +117,36 @@ public class SubjectController {
 				.addObject("semesterlist", semesterlist1).addObject("type", "Edit ").addObject("button", "Update ");
 	}
 
-	
+	@GetMapping(value = "faculty/viewSubject")
+	public ModelAndView facultyViewSubject(@RequestParam(required = false) Integer degreeId,
+			@RequestParam(required = false) Integer semesterId) {
+
+		List<DegreeVO> degreeList = this.degreeService.getDegree();
+
+		ModelMap map = new ModelMap();
+
+		if (degreeId != null && semesterId != null) {
+
+			map.addAttribute("degreeId", degreeId);
+			map.addAttribute("semesterId", semesterId);
+
+		} else {
+
+			DegreeVO degreeVO = degreeList.get(0);
+			degreeId = degreeVO.getId();
+
+			List<SemesterVO> semesterList = this.semesterService.findByDegree(degreeVO);
+			SemesterVO semesterVO = semesterList.get(0);
+
+			semesterId = semesterVO.getId();
+		}
+
+		List<SubjectVO> subjectList = this.subjectService.findByDegreeAndSemesterId(degreeId, semesterId);
+
+		System.out.println(subjectList.size());
+
+		return new ModelAndView("faculty/viewSubject", "subjectList", subjectList).addObject("degreeList", degreeList)
+				.addObject(map);
+	}
+
 }

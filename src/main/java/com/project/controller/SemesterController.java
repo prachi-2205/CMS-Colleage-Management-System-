@@ -1,8 +1,5 @@
 package com.project.controller;
 
-
-
-
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,14 +14,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.project.model.DegreeVO;
 import com.project.model.SemesterVO;
-import com.project.service.DegreeService;
 import com.project.service.SemesterService;
-
+import com.project.model.DegreeVO;
+import com.project.service.DegreeService;
 
 @Controller
 public class SemesterController {
+
 	@Autowired
 	private DegreeService degreeService;
 
